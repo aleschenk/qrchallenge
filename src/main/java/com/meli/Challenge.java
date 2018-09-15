@@ -58,7 +58,7 @@ public class Challenge {
 
   private void imageTemplate(final List<Tile> tiles) {
     try {
-      BufferedImage bi = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
+      BufferedImage bi = new BufferedImage(2000, 2000, BufferedImage.TYPE_INT_ARGB);
       Graphics2D g = bi.createGraphics();
 
       Font currentFont = g.getFont();
@@ -90,7 +90,6 @@ public class Challenge {
         g.setPaint(tile.downRightColor().color(true).darker());
         g.drawString(tile.downRightColor().label(), ((tile.position().x() - 1) * 100) + 60, ((tile.position().y() - 1) * 100) + 90);
       });
-//      g.drawString("A", 10, 40);
 
       ImageIO.write(bi, "PNG", new File("tiles.png"));
     } catch (final Exception e) {
