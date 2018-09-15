@@ -1,14 +1,25 @@
 package com.meli;
 
-import java.awt.Color;
+import com.google.common.collect.ImmutableList;
+import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.model.Graph;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.meli.Vector2.newVector;
+import static guru.nidi.graphviz.engine.Format.PNG;
+import static guru.nidi.graphviz.model.Factory.graph;
+import static guru.nidi.graphviz.model.Factory.node;
 
 public class QRImage {
   private static final int TILE_WIDTH_IN_PIXELS = 50;
@@ -37,12 +48,46 @@ public class QRImage {
     }
   }
 
+  public void createGraph() {
+//    CycleDetector<String, DefaultEdge> cycleDetector;
+//    Graph<String, DefaultEdge> g = new DefaultDirectedGraph<>(DefaultEdge.class);
+//    g.addEdge("b", "a");
+//    g.addEdge("c", "b");
+
+    try {
+
+//graph("example1").
+//      Graph g = graph("example1").directed()
+//        .with(
+//          node("A")
+//            .link(node("B"))
+//            .link(node("F"))
+//      );
+
+//      Map<Tuple<ColorBox>, List<Tile>> tupleListMap = tilesTuples();
+//      tupleListMap.entrySet().stream().forEach(entry -> {
+//            node(entry.getKey().toString())
+//              .with(RED)
+//              .link(entry.getValue().toString())
+//          );
+//      });
+
+      //(X,U) - [X-C U-T, K-X U-U]
+//      tupleListMap.get(new Tuple<ColorBox>());
+
+//      Graphviz.fromGraph(g).width(200).render(PNG).toFile(new File("graph.png"));
+
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public int totalTiles() {
     return tiles.size();
   }
 
-  public Map<Color, Integer> countColors() {
-    Map<Color, Integer> colors = new HashMap();
+  public Map<ColorBox, Integer> countColors() {
+    Map<ColorBox, Integer> colors = new HashMap();
     tiles.stream().forEach(tile -> {
       int upLeftColor = colors.getOrDefault(tile.upLeftColor(), 0);
       colors.put(tile.upLeftColor(), ++upLeftColor);
@@ -59,22 +104,32 @@ public class QRImage {
     return colors;
   }
 
-  public Map<Tuple<Color>, Integer> countDuplicateTuples() {
-    Map<Tuple<Color>, Integer> tuplesCount = new HashMap();
+  public Map<Tuple<ColorBox>, Integer> countDuplicateTuples() {
+    return tilesTuples().entrySet().stream()
+      .map(entry -> new SimpleEntry<>(entry.getKey(), entry.getValue().size()))
+      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  public Map<Tuple<ColorBox>, List<Tile>> tilesTuples() {
+    Map<Tuple<ColorBox>, List<Tile>> map = new HashMap();
     tiles.stream().forEach(tile -> {
-      int totalUpColorTuple = tuplesCount.getOrDefault(tile.upColorTuple(), 0);
-      tuplesCount.put(tile.upColorTuple(), ++totalUpColorTuple);
+      List<Tile> upTupleTile = map.getOrDefault(tile.upColorTuple(), new ArrayList());
+      upTupleTile.add(tile);
+      map.put(tile.upColorTuple(), upTupleTile);
 
-      int totalLeftColorTuple = tuplesCount.getOrDefault(tile.leftColorTuple(), 0);
-      tuplesCount.put(tile.leftColorTuple(), ++totalLeftColorTuple);
+      List<Tile> leftTupleTile = map.getOrDefault(tile.leftColorTuple(), new ArrayList());
+      leftTupleTile.add(tile);
+      map.put(tile.leftColorTuple(), leftTupleTile);
 
-      int totalRightColorTuple = tuplesCount.getOrDefault(tile.rightColorTuple(), 0);
-      tuplesCount.put(tile.rightColorTuple(), ++totalRightColorTuple);
+      List<Tile> rightTupleTile = map.getOrDefault(tile.rightColorTuple(), new ArrayList());
+      rightTupleTile.add(tile);
+      map.put(tile.rightColorTuple(), rightTupleTile);
 
-      int totalDownColorTuple = tuplesCount.getOrDefault(tile.downColorTuple(), 0);
-      tuplesCount.put(tile.downColorTuple(), ++totalDownColorTuple);
+      List<Tile> downTupleTile = map.getOrDefault(tile.downColorTuple(), new ArrayList());
+      downTupleTile.add(tile);
+      map.put(tile.downColorTuple(), downTupleTile);
     });
-    return tuplesCount;
+    return map;
   }
 
   private Tile createTile(final int column, final int row) {
@@ -114,5 +169,10 @@ public class QRImage {
   private static Vector2 downRight(final Vector2 vector) {
     return downLeft(vector).addVector(DISTANCE_BETWEEN_COLOR_TILES, 0);
   }
+
+  public List<Tile> tiles() {
+    return Collections.unmodifiableList(tiles);
+  }
+
 
 }

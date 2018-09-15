@@ -14,11 +14,35 @@
   </properties>
 
   <dependencies>
+
+    <!-- GUAVA -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>24.0-jre</version>
     </dependency>
+
+    <!-- JGRAPHT-CORE -->
+    <!--<dependency>-->
+      <!--<groupId>org.jgrapht</groupId>-->
+      <!--<artifactId>jgrapht-core</artifactId>-->
+      <!--<version>1.2.0</version>-->
+    <!--</dependency>-->
+
+    <!-- GRAPHVIZ-JAVA -->
+    <dependency>
+      <groupId>guru.nidi</groupId>
+      <artifactId>graphviz-java</artifactId>
+      <version>0.6.0</version>
+    </dependency>
+
+    <!-- LOGBACK-CLASSIC -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+
   </dependencies>
 
 </project>

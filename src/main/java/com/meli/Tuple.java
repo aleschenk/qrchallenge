@@ -13,10 +13,7 @@ public class Tuple<T> {
 
   @Override
   public String toString() {
-    return "Tuple{" +
-      "a=" + a +
-      ", b=" + b +
-      '}';
+    return "(" + a + "," + b + ')';
   }
 
   @Override

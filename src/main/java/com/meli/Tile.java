@@ -1,6 +1,6 @@
 package com.meli;
 
-import java.awt.Color;
+import java.awt.*;
 
 import static com.meli.Vector2.newVector;
 
@@ -31,51 +31,55 @@ import static com.meli.Vector2.newVector;
 class Tile {
   private final Vector2 position;
 
-  private final Color upLeftColor;
-  private final Color upRightColor;
-  private final Color downLeftColor;
-  private final Color downRightColor;
+  private final ColorBox upLeftColor;
+  private final ColorBox upRightColor;
+  private final ColorBox downLeftColor;
+  private final ColorBox downRightColor;
 
   Tile(final Vector2 position,
     final Color upLeftColor, final Color upRightColor,
     final Color downLeftColor, final Color downRightColor) {
 
     this.position = position;
-    this.upLeftColor = upLeftColor;
-    this.upRightColor = upRightColor;
-    this.downLeftColor = downLeftColor;
-    this.downRightColor = downRightColor;
+    this.upLeftColor = new ColorBox(upLeftColor);
+    this.upRightColor = new ColorBox(upRightColor);
+    this.downLeftColor = new ColorBox(downLeftColor);
+    this.downRightColor = new ColorBox(downRightColor);
   }
 
-  public Color upLeftColor() {
+  public static Tuple<ColorBox> tupleFrom(final String colorLabelA, final String colorLabelB) {
+    return new Tuple(ColorBox.from(colorLabelA), ColorBox.from(colorLabelB));
+  }
+
+  public ColorBox upLeftColor() {
     return upLeftColor;
   }
 
-  public Color upRightColor() {
+  public ColorBox upRightColor() {
     return upRightColor;
   }
 
-  public Color downLeftColor() {
+  public ColorBox downLeftColor() {
     return downLeftColor;
   }
 
-  public Color downRightColor() {
+  public ColorBox downRightColor() {
     return downRightColor;
   }
 
-  public Tuple<Color> upColorTuple() {
+  public Tuple<ColorBox> upColorTuple() {
     return new Tuple(upLeftColor, upRightColor);
   }
 
-  public Tuple<Color> leftColorTuple() {
+  public Tuple<ColorBox> leftColorTuple() {
     return new Tuple(upLeftColor, downLeftColor);
   }
 
-  public Tuple<Color> rightColorTuple() {
+  public Tuple<ColorBox> rightColorTuple() {
     return new Tuple(upRightColor, downRightColor);
   }
 
-  public Tuple<Color> downColorTuple() {
+  public Tuple<ColorBox> downColorTuple() {
     return new Tuple(downLeftColor, downRightColor);
   }
 
@@ -87,11 +91,15 @@ class Tile {
     return new Tile(newVector(column, row), upLeftColor, upRightColor, downLeftColor, downRightColor);
   }
 
-//  @Override
-//  public String toString() {
-//    return upLeft + "-" + upRight + " " + downLeft + "-" + downRight;
-//  }
-//
+  @Override
+  public String toString() {
+    return upLeftColor + "-" + upRightColor + " " + downLeftColor + "-" + downRightColor;
+  }
+
+  public Vector2 position() {
+    return position;
+  }
+
 //  public String prettyPrint() {
 //    return upLeft + "-" + upRight + "\n" +
 //      downLeft + "-" + downRight;
