@@ -1,12 +1,7 @@
 package com.meli;
 
-import com.google.common.collect.ImmutableList;
-import guru.nidi.graphviz.engine.Graphviz;
-import guru.nidi.graphviz.model.Graph;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +12,6 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.meli.Vector2.newVector;
-import static guru.nidi.graphviz.engine.Format.PNG;
 import static guru.nidi.graphviz.model.Factory.graph;
 import static guru.nidi.graphviz.model.Factory.node;
 
@@ -34,9 +28,12 @@ public class QRImage {
 
   private List<Tile> tiles = new ArrayList();
 
+  private Map<Tuple<ColorBox>, List<Tile>> tilesTuples;
+
   public QRImage(final BufferedImage bufferedImage) {
     this.bufferedImage = bufferedImage;
     createBoard();
+    this.tilesTuples = loadTilesTuples();
   }
 
   private void createBoard() {
@@ -46,6 +43,30 @@ public class QRImage {
         tiles.add(tile);
       }
     }
+  }
+
+  public void createTree() {
+    Map.Entry<Tuple<ColorBox>, List<Tile>> entry = tilesTuples.entrySet().stream()
+      .filter(tuple -> tuple.getValue().size() == 2)
+      .findFirst().get();
+
+    System.out.println(entry);
+    Tile tileA = entry.getValue().get(0);
+    Tile tileB = entry.getValue().get(1);
+
+    System.out.println("Tile A: " + tileA);
+    System.out.println("Tile B: " + tileA);
+
+    TreeNode node = new TreeNode(tileA);
+    node.add(tileB);
+
+    if(node.isRightNodeEmpty()) {
+      List<Tile> tiles = tilesTuples.get(node.rightTuple());
+      System.out.println(tiles);
+    }
+
+//    TreeNode tree = new TreeNode(entry.getValue().get(0));
+//    tree.add(entry.getValue().get(1));
   }
 
   public void createGraph() {
@@ -111,24 +132,30 @@ public class QRImage {
   }
 
   public Map<Tuple<ColorBox>, List<Tile>> tilesTuples() {
+    return tilesTuples;
+  }
+
+  private Map<Tuple<ColorBox>, List<Tile>> loadTilesTuples() {
     Map<Tuple<ColorBox>, List<Tile>> map = new HashMap();
+
     tiles.stream().forEach(tile -> {
-      List<Tile> upTupleTile = map.getOrDefault(tile.upColorTuple(), new ArrayList());
+      List<Tile> upTupleTile = map.getOrDefault(tile.upTuple(), new ArrayList());
       upTupleTile.add(tile);
-      map.put(tile.upColorTuple(), upTupleTile);
+      map.put(tile.upTuple(), upTupleTile);
 
-      List<Tile> leftTupleTile = map.getOrDefault(tile.leftColorTuple(), new ArrayList());
+      List<Tile> leftTupleTile = map.getOrDefault(tile.leftTuple(), new ArrayList());
       leftTupleTile.add(tile);
-      map.put(tile.leftColorTuple(), leftTupleTile);
+      map.put(tile.leftTuple(), leftTupleTile);
 
-      List<Tile> rightTupleTile = map.getOrDefault(tile.rightColorTuple(), new ArrayList());
+      List<Tile> rightTupleTile = map.getOrDefault(tile.rightTuple(), new ArrayList());
       rightTupleTile.add(tile);
-      map.put(tile.rightColorTuple(), rightTupleTile);
+      map.put(tile.rightTuple(), rightTupleTile);
 
-      List<Tile> downTupleTile = map.getOrDefault(tile.downColorTuple(), new ArrayList());
+      List<Tile> downTupleTile = map.getOrDefault(tile.downTuple(), new ArrayList());
       downTupleTile.add(tile);
-      map.put(tile.downColorTuple(), downTupleTile);
+      map.put(tile.downTuple(), downTupleTile);
     });
+
     return map;
   }
 
@@ -173,6 +200,5 @@ public class QRImage {
   public List<Tile> tiles() {
     return Collections.unmodifiableList(tiles);
   }
-
 
 }

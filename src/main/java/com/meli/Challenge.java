@@ -7,6 +7,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class Challenge {
 
@@ -22,7 +24,9 @@ public class Challenge {
     BufferedImage img = ImageIO.read(new File("challenge.png"));
 
     QRImage qr = new QRImage(img);
-    imageTemplate(qr.tiles());
+//    imageTemplate(qr.tiles());
+
+    qr.createTree();
 
 //    qr.createGraph();
 
@@ -35,14 +39,22 @@ public class Challenge {
 //    qr.countColors().entrySet().stream().forEach(entry -> {
 //      System.out.println(entry.getKey() + ": " + entry.getValue());
 //    });
-
+//
 //    qr.tilesTuples().entrySet().stream().forEach(entry -> {
 //      System.out.println(entry.getKey() + " - " + entry.getValue());
 //    });
 
+
+
+
 //    qr.tilesTuples().entrySet().stream()
 //      .filter(tuple -> tuple.getValue().size() == 2)
-//      .forEach(System.out::println);
+//      .forEach(new Consumer<Map.Entry<Tuple<ColorBox>, List<Tile>>>() {
+//        @Override
+//        public void accept(final Map.Entry<Tuple<ColorBox>, List<Tile>> tupleListEntry) {
+//          tupleListEntry.getValue()
+//        }
+//      });
 
 //    qr.tilesTuples().entrySet().stream().forEach(entry -> {
 //      if (entry.getValue().size() == 2) {

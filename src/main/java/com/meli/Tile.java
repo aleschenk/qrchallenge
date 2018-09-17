@@ -1,6 +1,6 @@
 package com.meli;
 
-import java.awt.*;
+import java.awt.Color;
 
 import static com.meli.Vector2.newVector;
 
@@ -31,20 +31,30 @@ import static com.meli.Vector2.newVector;
 class Tile {
   private final Vector2 position;
 
-  private final ColorBox upLeftColor;
-  private final ColorBox upRightColor;
-  private final ColorBox downLeftColor;
-  private final ColorBox downRightColor;
+  private final Tuple<ColorBox> upTuple;
+  private final Tuple<ColorBox> rightTuple;
+  private final Tuple<ColorBox> leftTuple;
+  private final Tuple<ColorBox> downTuple;
+
+  private final ColorBox upLeft;
+  private final ColorBox upRight;
+  private final ColorBox downLeft;
+  private final ColorBox downRight;
 
   Tile(final Vector2 position,
     final Color upLeftColor, final Color upRightColor,
     final Color downLeftColor, final Color downRightColor) {
 
     this.position = position;
-    this.upLeftColor = new ColorBox(upLeftColor);
-    this.upRightColor = new ColorBox(upRightColor);
-    this.downLeftColor = new ColorBox(downLeftColor);
-    this.downRightColor = new ColorBox(downRightColor);
+    this.upLeft = new ColorBox(upLeftColor);
+    this.upRight = new ColorBox(upRightColor);
+    this.downLeft = new ColorBox(downLeftColor);
+    this.downRight = new ColorBox(downRightColor);
+
+    upTuple = new Tuple(upLeft, upRight);
+    leftTuple = new Tuple(upLeft, downLeft);
+    rightTuple = new Tuple(upRight, downRight);
+    downTuple = new Tuple(downLeft, downRight);
   }
 
   public static Tuple<ColorBox> tupleFrom(final String colorLabelA, final String colorLabelB) {
@@ -52,35 +62,51 @@ class Tile {
   }
 
   public ColorBox upLeftColor() {
-    return upLeftColor;
+    return upLeft;
   }
 
   public ColorBox upRightColor() {
-    return upRightColor;
+    return upRight;
   }
 
   public ColorBox downLeftColor() {
-    return downLeftColor;
+    return downLeft;
   }
 
   public ColorBox downRightColor() {
-    return downRightColor;
+    return downRight;
   }
 
-  public Tuple<ColorBox> upColorTuple() {
-    return new Tuple(upLeftColor, upRightColor);
+  public Tuple<ColorBox> upTuple() {
+    return upTuple;
   }
 
-  public Tuple<ColorBox> leftColorTuple() {
-    return new Tuple(upLeftColor, downLeftColor);
+  public Tuple<ColorBox> leftTuple() {
+    return leftTuple;
   }
 
-  public Tuple<ColorBox> rightColorTuple() {
-    return new Tuple(upRightColor, downRightColor);
+  public Tuple<ColorBox> rightTuple() {
+    return rightTuple;
   }
 
-  public Tuple<ColorBox> downColorTuple() {
-    return new Tuple(downLeftColor, downRightColor);
+  public Tuple<ColorBox> downTuple() {
+    return downTuple;
+  }
+
+  public static final Tile fromPosition(
+    final int column, final int row, final String colors) {
+    return fromPosition(column, row, ColorBox.from(String.valueOf(colors.charAt(0))),
+      ColorBox.from(String.valueOf(colors.charAt(1))),
+      ColorBox.from(String.valueOf(colors.charAt(2))),
+      ColorBox.from(String.valueOf(colors.charAt(3))));
+  }
+
+  public static final Tile fromPosition(
+    final int column, final int row,
+    final ColorBox upLeftColor, final ColorBox upRightColor,
+    final ColorBox downLeftColor, final ColorBox downRightColor) {
+
+    return fromPosition(column, row, upLeftColor.color(), upRightColor.color(), downLeftColor.color(), downRightColor.color());
   }
 
   public static final Tile fromPosition(
@@ -91,13 +117,66 @@ class Tile {
     return new Tile(newVector(column, row), upLeftColor, upRightColor, downLeftColor, downRightColor);
   }
 
+  /**
+   * check if
+   * u(AB) = u(BA)
+   * u(AB) = d(AB)
+   * u(AB) = l(AB)
+   * u(AB) = r(BA)
+   * <p>
+   * r(AB) = r(BA)
+   * r(AB) = l(AB)
+   * r(AB) = d(AB)
+   * <p>
+   * l(AB) = l(BA)
+   * l(AB) = d(BA)
+   * <p>
+   * d(AB) = d(BA)
+   *
+   * @param otherTile
+   * @return
+   */
+  public boolean isComplementary(final Tile otherTile) {
+    return
+      upTuple.equals(otherTile.upTuple().inverse()) ||
+        upTuple.equals(otherTile.downTuple()) ||
+        upTuple.equals(otherTile.leftTuple) ||
+        upTuple.equals(otherTile.rightTuple.inverse()) ||
+        rightTuple.equals(otherTile.rightTuple.inverse()) ||
+        rightTuple.equals(otherTile.leftTuple) ||
+        rightTuple.equals(otherTile.downTuple) ||
+        leftTuple.equals(otherTile.leftTuple.inverse()) ||
+        leftTuple.equals(otherTile.downTuple.inverse()) ||
+        downTuple.equals(otherTile.downTuple.inverse());
+  }
+
+  public boolean isUpComplementary(final Tile tile) {
+    return
+      upTuple.equals(tile.upTuple().inverse()) ||
+        upTuple.equals(tile.downTuple()) ||
+        upTuple.equals(tile.leftTuple) ||
+        upTuple.equals(tile.rightTuple.inverse());
+  }
+
+  public boolean isRightComplementary(final Tile tile) {
+    return
+      rightTuple.equals(tile.rightTuple.inverse()) ||
+        rightTuple.equals(tile.leftTuple) ||
+        rightTuple.equals(tile.downTuple) ||
+        rightTuple.equals(tile.upTuple().inverse());
+  }
+
   @Override
   public String toString() {
-    return upLeftColor + "-" + upRightColor + " " + downLeftColor + "-" + downRightColor;
+    return upLeft + "-" + upRight + " " + downLeft + "-" + downRight;
   }
 
   public Vector2 position() {
     return position;
+  }
+
+  public void complementaryEdge(final Tile tile) {
+
   }
 
 //  public String prettyPrint() {
